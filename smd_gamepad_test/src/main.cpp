@@ -1,12 +1,12 @@
 #include <Arduino.h>
 
-const int pin1 = 0;
-const int pin2 = 0;
-const int pin3 = 0;
-const int pin4 = 0;
-const int pin6 = 0;
-const int pin7 = 0;
-const int pin9 = 0;
+const int pin1 = 1;
+const int pin2 = 2;
+const int pin3 = 3;
+const int pin4 = 4;
+const int pin6 = 5;
+const int pin7 = 6;
+const int pin9 = 7;
 
 const int pinSelect = pin7;
 
@@ -40,7 +40,9 @@ void loop() {
   // state 2
   digitalWrite(pinSelect, LOW);
   delayMicroseconds(delayBeforeReadMicros);
-  bool isConnected = digitalRead(pin3) && digitalRead(pin4);
+  bool isConnected = !digitalRead(pin3) && !digitalRead(pin4);
+  bool btnA = !digitalRead(pin6);
+  bool btnStart = !digitalRead(pin9);
 
   // state 3
   digitalWrite(pinSelect, HIGH);
@@ -49,13 +51,13 @@ void loop() {
   bool btnDown = !digitalRead(pin2);
   bool btnLeft = !digitalRead(pin3);
   bool btnRight = !digitalRead(pin4);
-  bool btnA = !digitalRead(pin6);
-  bool btnStart = !digitalRead(pin9);
+  bool btnB = !digitalRead(pin6);
+  bool btnC = !digitalRead(pin9);
 
   // state 4
   digitalWrite(pinSelect, LOW);
   delayMicroseconds(delayBeforeReadMicros);
-  bool isSixBtns = digitalRead(pin1) && digitalRead(pin2);
+  bool isSixBtns = !digitalRead(pin1) && !digitalRead(pin2);
 
   // state 5
   digitalWrite(pinSelect, HIGH);
@@ -73,7 +75,11 @@ void loop() {
   digitalWrite(pinSelect, HIGH);
   delayMicroseconds(delayBeforeReadMicros);
 
-  String outputString = String() + (int)isConnected + "\t" + (int)isSixBtns + "\t";
+  String outputString = String() 
+    + "isConnected: " + (int)isConnected + " isSixBtns: " + (int)isSixBtns 
+    + " btns: " + (int)btnUp + " " + (int)btnDown + " " + (int)btnLeft + " " + (int)btnRight + " " 
+    + (int)btnA + " " + (int)btnB + " " + (int)btnC + " "
+    + (int)btnX + " " + (int)btnY + " " + (int)btnZ + " " + (int)btnStart + " " + (int)btnMode;
   Serial.println(outputString);
 
   delayMicroseconds(2000);
@@ -81,5 +87,5 @@ void loop() {
   digitalWrite(LED_BUILTIN, HIGH);
   delay(10);
   digitalWrite(LED_BUILTIN, LOW);
-  delay(1000);
+  delay(100);
 }
