@@ -15,8 +15,6 @@ const unsigned long delayBeforeReadMicros = 10;
 void setup() {
   Serial.begin(115200);
 
-  pinMode(LED_BUILTIN, OUTPUT);
-
   pinMode(pin1, INPUT_PULLUP);
   pinMode(pin2, INPUT_PULLUP);
   pinMode(pin3, INPUT_PULLUP);
@@ -83,9 +81,4 @@ void loop() {
   Serial.println(outputString);
 
   delayMicroseconds(2000);
-
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(10);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
 }
