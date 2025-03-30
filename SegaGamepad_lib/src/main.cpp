@@ -2,7 +2,7 @@
 #include <Keyboard.h>
 #include "SegaGamepad.h"
 
-SegaGamepad segaGamepad(6, 1, 2, 3, 4, 5, 7);
+SegaGamepad segaGamepad(1, 2, 3, 4, 5, 6, 7);
 
 void setup() {
   Serial.begin(115200);

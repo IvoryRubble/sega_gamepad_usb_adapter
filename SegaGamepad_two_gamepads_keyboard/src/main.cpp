@@ -4,7 +4,7 @@
 
 const unsigned int delayBeforeReadMicros = 10; 
 const unsigned int delayBeforeNextUpdateMicros = 2000;
-SegaGamepad segaGamepad(6, 1, 2, 3, 4, 5, 7, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
+SegaGamepad segaGamepad(A0, A1, A2, A3, 1, 0, 2, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
 
 const int keysCount = 12;
 bool keys[keysCount];
@@ -46,8 +46,6 @@ void setup() {
   Serial.begin(115200);
   Keyboard.begin();
   segaGamepad.init();
-
-  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
