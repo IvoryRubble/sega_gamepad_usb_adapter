@@ -43,6 +43,20 @@ const char* keysReleasedMessages[keysCount] = {
   "segaGamepad.btnMode released"
 };
 
+const uint8_t keysKeyboard[keysCount] = {
+  'w',
+  's',
+  'a',
+  'd',
+  'j',
+  'k',
+  'l',
+  'u',
+  'i',
+  'o',
+  KEY_RETURN,
+  '\\'
+};
 
 void setup() {
   Serial.begin(115200);
@@ -81,8 +95,14 @@ void loop() {
   }
 
   for (int i = 0; i < keysCount; i++) {
-    if (keysPressed[i]) Serial.println(keysPressedMessages[i]);
-    if (keysReleased[i]) Serial.println(keysReleasedMessages[i]);
+    if (keysPressed[i]) {
+      Serial.println(keysPressedMessages[i]);
+      Keyboard.press(keysKeyboard[i]);
+    }
+    if (keysReleased[i]) {
+      Serial.println(keysReleasedMessages[i]);
+      Keyboard.release(keysKeyboard[i]);
+    }
   }
 
   memcpy(keysPrevious, keys, keysCount);
