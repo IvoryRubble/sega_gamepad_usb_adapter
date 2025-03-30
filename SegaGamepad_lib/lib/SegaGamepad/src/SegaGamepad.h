@@ -3,7 +3,7 @@
 
 class SegaGamepad {
     public:
-        SegaGamepad(uint8_t pin7, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, uint8_t pin6, uint8_t pin9, unsigned long delayBeforeReadMicros = 10, unsigned long delayBeforeNextUpdateMicros = 2000);
+        SegaGamepad(uint8_t pin7, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, uint8_t pin6, uint8_t pin9, unsigned int delayBeforeReadMicros = 10, unsigned int delayBeforeNextUpdateMicros = 2000);
         void init();
         void update();
 
@@ -31,8 +31,8 @@ class SegaGamepad {
         uint8_t pin4;
         uint8_t pin6;
         uint8_t pin9;
-        unsigned long delayBeforeReadMicros;
-        unsigned long delayBeforeNextUpdateMicros;
+        unsigned int delayBeforeReadMicros;
+        unsigned int delayBeforeNextUpdateMicros;
 
         unsigned long previousUpdateTime = 0;
 };

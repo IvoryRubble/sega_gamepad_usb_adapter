@@ -1,6 +1,6 @@
 #include "SegaGamepad.h"
 
-SegaGamepad::SegaGamepad(uint8_t pin7, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, uint8_t pin6, uint8_t pin9, unsigned long delayBeforeReadMicros, unsigned long delayBeforeNextUpdateMicros) : 
+SegaGamepad::SegaGamepad(uint8_t pin7, uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4, uint8_t pin6, uint8_t pin9, unsigned int delayBeforeReadMicros, unsigned int delayBeforeNextUpdateMicros) : 
     pinSelect(pin7),
     pin1(pin1),
     pin2(pin2),
