@@ -1,10 +1,13 @@
 #include <Arduino.h>
 #include <Keyboard.h>
 #include "SegaGamepad.h"
+#include "ButtonDebounce.h"
 
 const unsigned int delayBeforeReadMicros = 10; 
 const unsigned int delayBeforeNextUpdateMicros = 2000;
 SegaGamepad segaGamepad(6, 1, 2, 3, 4, 5, 7, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
+
+ButtonDebounce modeButtonDebounce(2000);
 
 const int keysCount = 12;
 bool keys[keysCount];
@@ -58,10 +61,14 @@ const uint8_t keysKeyboard[keysCount] = {
   '\\'
 };
 
+bool ledState = LOW;
+
 void setup() {
   Serial.begin(115200);
   Keyboard.begin();
   segaGamepad.init();
+
+  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 void loop() {
@@ -80,6 +87,8 @@ void loop() {
   keys[10] = segaGamepad.btnStart;
   keys[11] = segaGamepad.btnMode;
 
+  modeButtonDebounce.updateState(segaGamepad.btnMode);
+
   for (int i = 0; i < keysCount; i++) {
     if (keys[i] && !keysPrevious[i]) {
       keysPressed[i] = true;
@@ -96,14 +105,19 @@ void loop() {
 
   for (int i = 0; i < keysCount; i++) {
     if (keysPressed[i]) {
-      Serial.println(keysPressedMessages[i]);
-      Keyboard.press(keysKeyboard[i]);
+      // Serial.println(keysPressedMessages[i]);
+      // Keyboard.press(keysKeyboard[i]);
+      //ledState = !ledState;
     }
     if (keysReleased[i]) {
-      Serial.println(keysReleasedMessages[i]);
-      Keyboard.release(keysKeyboard[i]);
+      // Serial.println(keysReleasedMessages[i]);
+      // Keyboard.release(keysKeyboard[i]);
+      // ledState = !ledState;
     }
   }
 
+  ledState = modeButtonDebounce.btnState;
+
+  digitalWrite(LED_BUILTIN, ledState);
   memcpy(keysPrevious, keys, keysCount);
 }

@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Keyboard.h>
 #include "SegaGamepad.h"
+#include "ButtonDebounce.h"
 
 SegaGamepad segaGamepad(6, 1, 2, 3, 4, 5, 7);
 
