@@ -7,7 +7,7 @@ const unsigned int delayBeforeReadMicros = 10;
 const unsigned int delayBeforeNextUpdateMicros = 2000;
 SegaGamepad segaGamepad(6, 1, 2, 3, 4, 5, 7, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
 
-ButtonDebounce modeButtonDebounce(2000);
+ButtonDebounce modeButtonDebounce(50);
 
 const int keysCount = 12;
 bool keys[keysCount];
@@ -116,7 +116,11 @@ void loop() {
     }
   }
 
-  ledState = modeButtonDebounce.btnState;
+  if (modeButtonDebounce.isBtnPressed) {
+     ledState = !ledState;
+  }
+  // ledState = modeButtonDebounce.btnState;
+  // ledState = keys[11];
 
   digitalWrite(LED_BUILTIN, ledState);
   memcpy(keysPrevious, keys, keysCount);
