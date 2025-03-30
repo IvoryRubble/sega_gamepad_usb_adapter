@@ -1,49 +1,28 @@
 #include <Arduino.h>
 #include <Keyboard.h>
 #include "SegaGamepad.h"
-#include "ButtonDebounce.h"
 
 const unsigned int delayBeforeReadMicros = 10; 
 const unsigned int delayBeforeNextUpdateMicros = 2000;
 SegaGamepad segaGamepad(6, 1, 2, 3, 4, 5, 7, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
 
-ButtonDebounce modeButtonDebounce(50);
-
 const int keysCount = 12;
 bool keys[keysCount];
 bool keysPrevious[keysCount];
 
-bool keysPressed[keysCount];
-bool keysReleased[keysCount];
-
-const char* keysPressedMessages[keysCount] = {
-  "segaGamepad.btnUp pressed",
-  "segaGamepad.btnDown pressed",
-  "segaGamepad.btnLeft pressed",
-  "segaGamepad.btnRight pressed",
-  "segaGamepad.btnA pressed",
-  "segaGamepad.btnB pressed",
-  "segaGamepad.btnC pressed",
-  "segaGamepad.btnX pressed",
-  "segaGamepad.btnY pressed",
-  "segaGamepad.btnZ pressed",
-  "segaGamepad.btnStart pressed",
-  "segaGamepad.btnMode pressed"
-};
-
-const char* keysReleasedMessages[keysCount] = {
-  "segaGamepad.btnUp released",
-  "segaGamepad.btnDown released",
-  "segaGamepad.btnLeft released",
-  "segaGamepad.btnRight released",
-  "segaGamepad.btnA released",
-  "segaGamepad.btnB released",
-  "segaGamepad.btnC released",
-  "segaGamepad.btnX released",
-  "segaGamepad.btnY released",
-  "segaGamepad.btnZ released",
-  "segaGamepad.btnStart released",
-  "segaGamepad.btnMode released"
+const char* keysNames[keysCount] = {
+  "btnUp",
+  "btnDown",
+  "btnLeft",
+  "btnRight",
+  "btnA",
+  "btnB",
+  "btnC",
+  "btnX",
+  "btnY",
+  "btnZ",
+  "btnStart",
+  "btnMode"
 };
 
 const uint8_t keysKeyboard[keysCount] = {
@@ -87,41 +66,17 @@ void loop() {
   keys[10] = segaGamepad.btnStart;
   keys[11] = segaGamepad.btnMode;
 
-  modeButtonDebounce.updateState(segaGamepad.btnMode);
-
   for (int i = 0; i < keysCount; i++) {
     if (keys[i] && !keysPrevious[i]) {
-      keysPressed[i] = true;
-    } else {
-      keysPressed[i] = false;
+      Serial.print(keysNames[i]); Serial.println(" pressed");
+      Keyboard.press(keysKeyboard[i]);
     }
 
     if (!keys[i] && keysPrevious[i]) {
-      keysReleased[i] = true;
-    } else {
-      keysReleased[i] = false;
+      Serial.print(keysNames[i]); Serial.println(" released");
+      Keyboard.release(keysKeyboard[i]);
     }
   }
 
-  for (int i = 0; i < keysCount; i++) {
-    if (keysPressed[i]) {
-      // Serial.println(keysPressedMessages[i]);
-      // Keyboard.press(keysKeyboard[i]);
-      //ledState = !ledState;
-    }
-    if (keysReleased[i]) {
-      // Serial.println(keysReleasedMessages[i]);
-      // Keyboard.release(keysKeyboard[i]);
-      // ledState = !ledState;
-    }
-  }
-
-  if (modeButtonDebounce.isBtnPressed) {
-     ledState = !ledState;
-  }
-  // ledState = modeButtonDebounce.btnState;
-  // ledState = keys[11];
-
-  digitalWrite(LED_BUILTIN, ledState);
   memcpy(keysPrevious, keys, keysCount);
 }
