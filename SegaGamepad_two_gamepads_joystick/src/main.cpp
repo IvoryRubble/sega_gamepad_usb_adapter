@@ -122,6 +122,32 @@ void loop() {
     }
   }
 
+  bool isArrowChanged = false;
+  for (int i = 0; i < 4; i++) {
+    isArrowChanged = isArrowChanged || (keys1[i] != keysPrevious1[i]);
+  }
+  if (isArrowChanged) {
+    if (segaGamepad1.btnUp && segaGamepad1.btnRight) {
+      joystick1.setHatSwitch(0, 45);
+    } else if (segaGamepad1.btnRight && segaGamepad1.btnDown) {
+      joystick1.setHatSwitch(0, 135);
+    } else if (segaGamepad1.btnDown && segaGamepad1.btnLeft) {
+      joystick1.setHatSwitch(0, 225);
+    } else if (segaGamepad1.btnLeft && segaGamepad1.btnUp) {
+      joystick1.setHatSwitch(0, 315);
+    } else if (segaGamepad1.btnUp) {
+      joystick1.setHatSwitch(0, 0);
+    } else if (segaGamepad1.btnRight) {
+      joystick1.setHatSwitch(0, 90);
+    } else if (segaGamepad1.btnDown) {
+      joystick1.setHatSwitch(0, 180);
+    } else if (segaGamepad1.btnLeft) {
+      joystick1.setHatSwitch(0, 270);
+    } else {
+      joystick1.setHatSwitch(0, -1);
+    }
+  }
+
   memcpy(keysPrevious1, keys1, keysCount);
   memcpy(keysPrevious2, keys2, keysCount);
 }
