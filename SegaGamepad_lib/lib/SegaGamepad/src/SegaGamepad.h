@@ -24,12 +24,12 @@ class SegaGamepad {
         bool btnMode = false;
 
     private:
-        uint8_t pinSelect;
         uint8_t pin1;
         uint8_t pin2;
         uint8_t pin3;
         uint8_t pin4;
         uint8_t pin6;
+        uint8_t pinSelect;
         uint8_t pin9;
         unsigned int delayBeforeReadMicros;
         unsigned int delayBeforeNextUpdateMicros;

@@ -63,8 +63,6 @@ const uint8_t keysKeyboard2[keysCount] = {
   ','
 };
 
-bool ledState = LOW;
-
 void setup() {
   Serial.begin(115200);
   Keyboard.begin();
