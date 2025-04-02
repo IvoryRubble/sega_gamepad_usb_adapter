@@ -51,6 +51,9 @@ const uint8_t keysJoystick[keysCount] = {
   7
 };
 
+void pressJoystickKey(bool key, bool keyPrevious, int keyIndex, int gamepadIndex, Joystick_& joystick);
+void updateJoystickHat(bool keys[], bool keysPrevious[], SegaGamepad& segaGamepad, Joystick_& joystick);
+
 void setup() {
   Serial.begin(115200);
   joystick1.begin();
@@ -93,61 +96,57 @@ void loop() {
   keys2[11] = modeButtonDebounce2.btnState;
 
   for (int i = 0; i < keysCount; i++) {
-    if (keys1[i] && !keysPrevious1[i]) {
-      Serial.print(keysNames[i]); Serial.println(" pressed on gamepad 1");
-      if (i >= 4) {
-        joystick1.pressButton(keysJoystick[i]);
-      }
-    }
-
-    if (!keys1[i] && keysPrevious1[i]) {
-      Serial.print(keysNames[i]); Serial.println(" released on gamepad 1");
-      if (i >= 4) {
-        joystick1.releaseButton(keysJoystick[i]);
-      }
-    }
-
-    if (keys2[i] && !keysPrevious2[i]) {
-      Serial.print(keysNames[i]); Serial.println(" pressed on gamepad 2");
-      if (i >= 4) {
-        joystick2.pressButton(keysJoystick[i]);
-      }
-    }
-
-    if (!keys2[i] && keysPrevious2[i]) {
-      Serial.print(keysNames[i]); Serial.println(" released on gamepad 2");
-      if (i >= 4) {
-        joystick2.releaseButton(keysJoystick[i]);
-      }
-    }
+    pressJoystickKey(keys1[i], keysPrevious1[i], i, 1, joystick1);
+    pressJoystickKey(keys2[i], keysPrevious2[i], i, 2, joystick2);
   }
 
-  bool isArrowChanged = false;
-  for (int i = 0; i < 4; i++) {
-    isArrowChanged = isArrowChanged || (keys1[i] != keysPrevious1[i]);
-  }
-  if (isArrowChanged) {
-    if (segaGamepad1.btnUp && segaGamepad1.btnRight) {
-      joystick1.setHatSwitch(0, 45);
-    } else if (segaGamepad1.btnRight && segaGamepad1.btnDown) {
-      joystick1.setHatSwitch(0, 135);
-    } else if (segaGamepad1.btnDown && segaGamepad1.btnLeft) {
-      joystick1.setHatSwitch(0, 225);
-    } else if (segaGamepad1.btnLeft && segaGamepad1.btnUp) {
-      joystick1.setHatSwitch(0, 315);
-    } else if (segaGamepad1.btnUp) {
-      joystick1.setHatSwitch(0, 0);
-    } else if (segaGamepad1.btnRight) {
-      joystick1.setHatSwitch(0, 90);
-    } else if (segaGamepad1.btnDown) {
-      joystick1.setHatSwitch(0, 180);
-    } else if (segaGamepad1.btnLeft) {
-      joystick1.setHatSwitch(0, 270);
-    } else {
-      joystick1.setHatSwitch(0, -1);
-    }
-  }
-
+  updateJoystickHat(keys1, keysPrevious1, segaGamepad1, joystick1);
+  updateJoystickHat(keys2, keysPrevious2, segaGamepad2, joystick2);
+  
   memcpy(keysPrevious1, keys1, keysCount);
   memcpy(keysPrevious2, keys2, keysCount);
+}
+
+void pressJoystickKey(bool key, bool keyPrevious, int keyIndex, int gamepadIndex, Joystick_& joystick) {
+  if (key && !keyPrevious) {
+      Serial.print(keysNames[keyIndex]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+      if (keyIndex >= 4) {
+        joystick.pressButton(keysJoystick[keyIndex]);
+      }
+    }
+
+    if (!key && keyPrevious) {
+      Serial.print(keysNames[keyIndex]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+      if (keyIndex >= 4) {
+        joystick.releaseButton(keysJoystick[keyIndex]);
+      }
+    }
+}
+
+void updateJoystickHat(bool keys[], bool keysPrevious[], SegaGamepad& segaGamepad, Joystick_& joystick) {
+  bool isArrowChanged = false;
+  for (int i = 0; i < 4; i++) {
+    isArrowChanged = isArrowChanged || (keys[i] != keysPrevious[i]);
+  }
+  if (isArrowChanged) {
+    if (segaGamepad.btnUp && segaGamepad.btnRight) {
+      joystick.setHatSwitch(0, 45);
+    } else if (segaGamepad.btnRight && segaGamepad.btnDown) {
+      joystick.setHatSwitch(0, 135);
+    } else if (segaGamepad.btnDown && segaGamepad.btnLeft) {
+      joystick.setHatSwitch(0, 225);
+    } else if (segaGamepad.btnLeft && segaGamepad.btnUp) {
+      joystick.setHatSwitch(0, 315);
+    } else if (segaGamepad.btnUp) {
+      joystick.setHatSwitch(0, 0);
+    } else if (segaGamepad.btnRight) {
+      joystick.setHatSwitch(0, 90);
+    } else if (segaGamepad.btnDown) {
+      joystick.setHatSwitch(0, 180);
+    } else if (segaGamepad.btnLeft) {
+      joystick.setHatSwitch(0, 270);
+    } else {
+      joystick.setHatSwitch(0, -1);
+    }
+  }
 }
