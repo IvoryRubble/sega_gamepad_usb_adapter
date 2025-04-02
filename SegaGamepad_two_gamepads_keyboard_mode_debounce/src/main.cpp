@@ -3,6 +3,8 @@
 #include "SegaGamepad.h"
 #include "ButtonDebounce.h"
 
+const bool serialPrintEnabled = false;
+
 const unsigned int delayBeforeReadMicros = 10; 
 const unsigned int delayBeforeNextUpdateMicros = 2000;
 SegaGamepad segaGamepad1(A0, A1, A2, A3, 1, 0, 2, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
@@ -97,13 +99,23 @@ void handleGamepad(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], c
 
   for (int i = 0; i < keysCount; i++) {
     if (keys[i] && !keysPrevious[i]) {
-      Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
       Keyboard.press(keysKeyboard[i]);
     }
 
     if (!keys[i] && keysPrevious[i]) {
-      Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
       Keyboard.release(keysKeyboard[i]);
+    }
+  }
+
+  if (serialPrintEnabled) {
+    for (int i = 0; i < keysCount; i++) {
+      if (keys[i] && !keysPrevious[i]) {
+        Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+      }
+
+      if (!keys[i] && keysPrevious[i]) {
+        Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+      }
     }
   }
 

@@ -2,6 +2,8 @@
 #include <Keyboard.h>
 #include "SegaGamepad.h"
 
+const bool serialPrintEnabled = false;
+
 const unsigned int delayBeforeReadMicros = 10; 
 const unsigned int delayBeforeNextUpdateMicros = 2000;
 SegaGamepad segaGamepad1(A0, A1, A2, A3, 1, 0, 2, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
@@ -58,6 +60,8 @@ const uint8_t keysKeyboard2[keysCount] = {
   ','
 };
 
+void handleGamepad(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[], int gamepadIndex);
+
 void setup() {
   Serial.begin(115200);
   Keyboard.begin();
@@ -66,57 +70,47 @@ void setup() {
 }
 
 void loop() {
-  segaGamepad1.update();
-  segaGamepad2.update();
+  handleGamepad(segaGamepad1, keys1, keysPrevious1, keysKeyboard1, 1);
+  handleGamepad(segaGamepad2, keys2, keysPrevious2, keysKeyboard2, 2);
+}
 
-  keys1[0] = segaGamepad1.btnUp;
-  keys1[1] = segaGamepad1.btnDown;
-  keys1[2] = segaGamepad1.btnLeft;
-  keys1[3] = segaGamepad1.btnRight;
-  keys1[4] = segaGamepad1.btnA;
-  keys1[5] = segaGamepad1.btnB;
-  keys1[6] = segaGamepad1.btnC;
-  keys1[7] = segaGamepad1.btnX;
-  keys1[8] = segaGamepad1.btnY;
-  keys1[9] = segaGamepad1.btnZ;
-  keys1[10] = segaGamepad1.btnStart;
-  keys1[11] = segaGamepad1.btnMode;
+void handleGamepad(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[], int gamepadIndex) {
+  segaGamepad.update();
 
-  keys2[0] = segaGamepad2.btnUp;
-  keys2[1] = segaGamepad2.btnDown;
-  keys2[2] = segaGamepad2.btnLeft;
-  keys2[3] = segaGamepad2.btnRight;
-  keys2[4] = segaGamepad2.btnA;
-  keys2[5] = segaGamepad2.btnB;
-  keys2[6] = segaGamepad2.btnC;
-  keys2[7] = segaGamepad2.btnX;
-  keys2[8] = segaGamepad2.btnY;
-  keys2[9] = segaGamepad2.btnZ;
-  keys2[10] = segaGamepad2.btnStart;
-  keys2[11] = segaGamepad2.btnMode;
+  keys[0] = segaGamepad.btnUp;
+  keys[1] = segaGamepad.btnDown;
+  keys[2] = segaGamepad.btnLeft;
+  keys[3] = segaGamepad.btnRight;
+  keys[4] = segaGamepad.btnA;
+  keys[5] = segaGamepad.btnB;
+  keys[6] = segaGamepad.btnC;
+  keys[7] = segaGamepad.btnX;
+  keys[8] = segaGamepad.btnY;
+  keys[9] = segaGamepad.btnZ;
+  keys[10] = segaGamepad.btnStart;
+  keys[11] = segaGamepad.btnMode;
 
   for (int i = 0; i < keysCount; i++) {
-    if (keys1[i] && !keysPrevious1[i]) {
-      Serial.print(keysNames[i]); Serial.println(" pressed on gamepad 1");
-      Keyboard.press(keysKeyboard1[i]);
+    if (keys[i] && !keysPrevious[i]) {
+      Keyboard.press(keysKeyboard[i]);
     }
 
-    if (!keys1[i] && keysPrevious1[i]) {
-      Serial.print(keysNames[i]); Serial.println(" released on gamepad 1");
-      Keyboard.release(keysKeyboard1[i]);
-    }
-
-    if (keys2[i] && !keysPrevious2[i]) {
-      Serial.print(keysNames[i]); Serial.println(" pressed on gamepad 2");
-      Keyboard.press(keysKeyboard2[i]);
-    }
-
-    if (!keys2[i] && keysPrevious2[i]) {
-      Serial.print(keysNames[i]); Serial.println(" released on gamepad 2");
-      Keyboard.release(keysKeyboard2[i]);
+    if (!keys[i] && keysPrevious[i]) {
+      Keyboard.release(keysKeyboard[i]);
     }
   }
 
-  memcpy(keysPrevious1, keys1, keysCount);
-  memcpy(keysPrevious2, keys2, keysCount);
+  if (serialPrintEnabled) {
+    for (int i = 0; i < keysCount; i++) {
+      if (keys[i] && !keysPrevious[i]) {
+        Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+      }
+
+      if (!keys[i] && keysPrevious[i]) {
+        Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+      }
+    }
+  }
+
+  memcpy(keysPrevious, keys, keysCount);
 }
