@@ -101,20 +101,22 @@ void setup() {
     delay(5000);
     Serial.println(); Serial.println("Please stand by..."); 
     delay(1000);
-    Serial.println(); Serial.println("Enabled serial output by pressing Start+Up on first gamepad during startup");
+    Serial.println(); Serial.println("Enabled serial output by pressing Start on first gamepad during startup");
   } else {
     serialPrintEnabled = false;
   }
 
-  if (segaGamepad1.btnA && segaGamepad1.btnStart) {
-    mode = (Mode)((mode + 1) % modesCount);   
+  if (segaGamepad1.btnStart && (segaGamepad1.btnA || segaGamepad1.btnB)) {
+    if (segaGamepad1.btnA) mode = Mode::keyboard;
+    if (segaGamepad1.btnB) mode = Mode::joystick;
     EEPROM.put(modeStorageAddress, mode); 
-    if (serialPrintEnabled) Serial.println("Output mode changed by pressing Start+A on first gamepad during startup");
-  } else {
-    if (serialPrintEnabled) Serial.println("Press Start+A on first gamepad during startup to change output mode");
   }
 
-  if (serialPrintEnabled) { Serial.print("Current output mode: "); Serial.println(modeNames[mode]); Serial.println(); }
+  if (serialPrintEnabled) {
+    Serial.println("Press Start+A on first gamepad during startup to change output mode to keyboard");
+    Serial.println("Press Start+B on first gamepad during startup to change output mode to joystick");
+    Serial.print("Current output mode: "); Serial.println(modeNames[mode]); Serial.println(); 
+  }
 }
 
 void loop() {
