@@ -5,13 +5,14 @@
 #include "SegaGamepad.h"
 #include "ButtonDebounce.h"
 
-const bool serialPrintEnabled = false;
+bool serialPrintEnabled = false;
 
-int modesCount = 2;
+const int modesCount = 2;
 enum Mode {
   keyboard = 0,
   joystick = 1
 };
+const char* modeNames[modesCount] = { "keyboard", "joystick" };
 
 Mode mode = keyboard;
 int modeStorageAddress = 24;
@@ -82,19 +83,38 @@ const uint8_t keysKeyboard2[keysCount] = {
 void handleGamepad(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[], int gamepadIndex, ButtonDebounce& modeButtonDebounce);
 
 void setup() {
-  Serial.begin(115200);
   Keyboard.begin();
   segaGamepad1.init();
   segaGamepad2.init();
 
   EEPROM.get(modeStorageAddress, mode);
-  mode = (Mode)(mode % modesCount);
+  mode = (Mode)(mode % modesCount); 
+
+  delay(2000);
   for (int i = 0; i < 3; i++) {
     segaGamepad1.update();
   }
+
+  if (segaGamepad1.btnStart) {
+    serialPrintEnabled = true;
+    Serial.begin(115200);
+    delay(5000);
+    Serial.println(); Serial.println("Please stand by..."); 
+    delay(1000);
+    Serial.println(); Serial.println("Enabled serial output by pressing Start+Up on first gamepad during startup");
+  } else {
+    serialPrintEnabled = false;
+  }
+
   if (segaGamepad1.btnA && segaGamepad1.btnStart) {
-    mode = (Mode)((mode + 1) % modesCount);    
-  }  
+    mode = (Mode)((mode + 1) % modesCount);   
+    EEPROM.put(modeStorageAddress, mode); 
+    if (serialPrintEnabled) Serial.println("Output mode changed by pressing Start+A on first gamepad during startup");
+  } else {
+    if (serialPrintEnabled) Serial.println("Press Start+A on first gamepad during startup to change output mode");
+  }
+
+  if (serialPrintEnabled) { Serial.print("Current output mode: "); Serial.println(modeNames[mode]); Serial.println(); }
 }
 
 void loop() {
