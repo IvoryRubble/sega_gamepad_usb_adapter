@@ -7,15 +7,15 @@
 
 bool serialPrintEnabled = false;
 
-const int modesCount = 2;
-enum Mode {
+const int outputModesCount = 2;
+enum OutputMode {
   keyboard = 0,
   joystick = 1
 };
-const char* modeNames[modesCount] = { "keyboard", "joystick" };
+const char* outputModeNames[outputModesCount] = { "keyboard", "joystick" };
 
-Mode mode = keyboard;
-int modeStorageAddress = 24;
+OutputMode outputMode = keyboard;
+int outputModeStorageAddress = 24;
 
 Joystick_ joystick1(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_GAMEPAD, 8, 1, false, false, false, false, false, false, false, false, false, false, false);
 Joystick_ joystick2(JOYSTICK_DEFAULT_REPORT_ID + 1, JOYSTICK_TYPE_GAMEPAD, 8, 1, false, false, false, false, false, false, false, false, false, false, false);
@@ -30,10 +30,6 @@ ButtonDebounce modeButtonDebounce1(debounceDelayMillis);
 ButtonDebounce modeButtonDebounce2(debounceDelayMillis);
 
 const int keysCount = 12;
-bool keys1[keysCount];
-bool keys2[keysCount];
-bool keysPrevious1[keysCount];
-bool keysPrevious2[keysCount];
 
 const char* keysNames[keysCount] = {
   "btnUp",
@@ -80,55 +76,228 @@ const uint8_t keysKeyboard2[keysCount] = {
   ','
 };
 
-void handleGamepad(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[], int gamepadIndex, ButtonDebounce& modeButtonDebounce);
+const uint8_t keysJoystick[keysCount] = {
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7
+};
+
+void initSerialPrintEnableFlag();
+void initOutputMode();
+void printOutputModeInfo();
+void printGamepadStatusOnSetup(SegaGamepad& segaGamepad, int gamepadIndex);
+void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, ButtonDebounce& modeButtonDebounce, const uint8_t keysKeyboard[], Joystick_& joystick);
+void updateJoystick(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], Joystick_& joystick);
+void updateKeyboard(bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[]);
+void printGamepadStatus(SegaGamepad& segaGamepad, int gamepadIndex, bool keys[], bool keysPrevious[], bool isConnectedPrevious, bool isSixButtonsPrevious);
+void initKeys(bool keys[], SegaGamepad& segaGamepad, ButtonDebounce& modeButtonDebounce);
 
 void setup() {
-  Keyboard.begin();
   segaGamepad1.init();
   segaGamepad2.init();
 
-  EEPROM.get(modeStorageAddress, mode);
-  mode = (Mode)(mode % modesCount); 
-
   delay(2000);
-  for (int i = 0; i < 3; i++) {
+  int gamepadReadigsToDiscard = 2;
+  for (int i = 0; i < gamepadReadigsToDiscard + 1; i++) {
     segaGamepad1.update();
+    segaGamepad2.update();
   }
 
-  if (segaGamepad1.btnStart) {
-    serialPrintEnabled = true;
-    Serial.begin(115200);
-    delay(5000);
-    Serial.println(); Serial.println("Please stand by..."); 
-    delay(1000);
-    Serial.println(); Serial.println("Enabled serial output by pressing Start on first gamepad during startup");
-  } else {
-    serialPrintEnabled = false;
+  initSerialPrintEnableFlag();
+  initOutputMode();
+
+  if (serialPrintEnabled) {
+    printOutputModeInfo();
   }
 
-  if (segaGamepad1.btnStart && (segaGamepad1.btnA || segaGamepad1.btnB)) {
-    if (segaGamepad1.btnA) mode = Mode::keyboard;
-    if (segaGamepad1.btnB) mode = Mode::joystick;
-    EEPROM.put(modeStorageAddress, mode); 
+  switch (outputMode) {
+    case OutputMode::keyboard:
+      Keyboard.begin();
+      break;
+    case OutputMode::joystick:
+      joystick1.begin();
+      joystick2.begin();
+      break;
   }
 
   if (serialPrintEnabled) {
-    Serial.println("Press Start+A on first gamepad during startup to change output mode to keyboard");
-    Serial.println("Press Start+B on first gamepad during startup to change output mode to joystick");
-    Serial.print("Current output mode: "); Serial.println(modeNames[mode]); Serial.println(); 
+    printGamepadStatusOnSetup(segaGamepad1, 1);
+    printGamepadStatusOnSetup(segaGamepad2, 2);
   }
 }
 
 void loop() {
-  handleGamepad(segaGamepad1, keys1, keysPrevious1, keysKeyboard1, 1, modeButtonDebounce1);
-  handleGamepad(segaGamepad2, keys2, keysPrevious2, keysKeyboard2, 2, modeButtonDebounce2);
+  handleGamepad(segaGamepad1, 1, modeButtonDebounce1, keysKeyboard1, joystick1);
+  handleGamepad(segaGamepad2, 2, modeButtonDebounce2, keysKeyboard2, joystick2);
 }
 
-void handleGamepad(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[], int gamepadIndex, ButtonDebounce& modeButtonDebounce) {
-  segaGamepad.update();
+void printOutputModeInfo() {
+  Serial.println("Press Start+A on first gamepad during startup to change output mode to keyboard");
+  Serial.println("Press Start+B on first gamepad during startup to change output mode to joystick");
+  Serial.print("Current output mode: ");
+  Serial.println(outputModeNames[outputMode]);
+  Serial.println();
+}
 
+void initOutputMode() {
+  if (segaGamepad1.btnStart && (segaGamepad1.btnA || segaGamepad1.btnB)) {
+    if (segaGamepad1.btnA) outputMode = OutputMode::keyboard;
+    if (segaGamepad1.btnB) outputMode = OutputMode::joystick;
+    EEPROM.put(outputModeStorageAddress, outputMode);
+  } else {
+    EEPROM.get(outputModeStorageAddress, outputMode);
+    outputMode = (OutputMode)(outputMode % outputModesCount);
+  }
+}
+
+void initSerialPrintEnableFlag() {
+  if (segaGamepad1.btnStart) {
+    serialPrintEnabled = true;
+    Serial.begin(115200);
+    delay(5000);
+    Serial.println();
+    Serial.println("Please stand by...");
+    delay(1000);
+    Serial.println();
+    Serial.println("Enabled serial output by pressing Start on first gamepad during startup");
+  } else {
+    serialPrintEnabled = false;
+  }
+}
+
+void printGamepadStatusOnSetup(SegaGamepad& segaGamepad, int gamepadIndex) {
+  if (segaGamepad.isConnected) {
+    Serial.print("Gamepad "); Serial.print(gamepadIndex); Serial.println(" connected"); 
+  } else {
+    Serial.print("Gamepad "); Serial.print(gamepadIndex); Serial.println(" disconnected"); 
+  }
+
+  if (segaGamepad.isConnected && segaGamepad.isSixBtns) {
+    Serial.print("Gamepad "); Serial.print(gamepadIndex); Serial.print(" type: "); 
+    if (segaGamepad.isSixBtns) {
+      Serial.println("\"six buttons\"");
+    } else {
+      Serial.println("\"three buttons\"");
+    }
+  }
+  Serial.println();
+}
+
+void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, ButtonDebounce& modeButtonDebounce, const uint8_t keysKeyboard[], Joystick_& joystick) {
+  bool keysPrevious[keysCount];
+  initKeys(keysPrevious, segaGamepad, modeButtonDebounce);
+  bool isConnectedPrevious = segaGamepad.isConnected;
+  bool isSixButtonsPrevious = segaGamepad.isSixBtns;
+
+  segaGamepad.update();
   modeButtonDebounce.updateState(segaGamepad.btnMode);
 
+  bool keys[keysCount];
+  initKeys(keys, segaGamepad, modeButtonDebounce);
+
+  switch (outputMode) {
+    case OutputMode::keyboard:
+      updateKeyboard(keys, keysPrevious, keysKeyboard);
+      break;
+    case OutputMode::joystick:
+      updateJoystick(segaGamepad, keys, keysPrevious, joystick);
+      break;  
+  }
+  
+  if (serialPrintEnabled) {
+    printGamepadStatus(segaGamepad, gamepadIndex, keys, keysPrevious, isConnectedPrevious, isSixButtonsPrevious);
+  }
+}
+
+void updateKeyboard(bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[]) {
+  for (int i = 0; i < keysCount; i++) {
+    if (keys[i] && !keysPrevious[i]) {
+      Keyboard.press(keysKeyboard[i]);
+    }
+    if (!keys[i] && keysPrevious[i]) {
+      Keyboard.release(keysKeyboard[i]);
+    }
+  }
+}
+
+void updateJoystick(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], Joystick_& joystick) {
+  for (int i = 0; i < keysCount; i++) {
+    if (keys[i] && !keysPrevious[i]) {
+      if (i >= 4) {
+        joystick.pressButton(keysJoystick[i]);
+      }
+    }
+    if (!keys[i] && keysPrevious[i]) {
+      if (i >= 4) {
+        joystick.releaseButton(keysJoystick[i]);
+      }
+    }
+  }
+
+  bool isArrowChanged = false;
+  for (int i = 0; i < 4; i++) {
+    isArrowChanged = isArrowChanged || (keys[i] != keysPrevious[i]);
+  }
+  if (isArrowChanged) {
+    if (segaGamepad.btnUp && segaGamepad.btnRight) {
+      joystick.setHatSwitch(0, 45);
+    } else if (segaGamepad.btnRight && segaGamepad.btnDown) {
+      joystick.setHatSwitch(0, 135);
+    } else if (segaGamepad.btnDown && segaGamepad.btnLeft) {
+      joystick.setHatSwitch(0, 225);
+    } else if (segaGamepad.btnLeft && segaGamepad.btnUp) {
+      joystick.setHatSwitch(0, 315);
+    } else if (segaGamepad.btnUp) {
+      joystick.setHatSwitch(0, 0);
+    } else if (segaGamepad.btnRight) {
+      joystick.setHatSwitch(0, 90);
+    } else if (segaGamepad.btnDown) {
+      joystick.setHatSwitch(0, 180);
+    } else if (segaGamepad.btnLeft) {
+      joystick.setHatSwitch(0, 270);
+    } else {
+      joystick.setHatSwitch(0, -1);
+    }
+  }
+}
+
+void printGamepadStatus(SegaGamepad& segaGamepad, int gamepadIndex, bool keys[], bool keysPrevious[], bool isConnectedPrevious, bool isSixButtonsPrevious) {
+  for (int i = 0; i < keysCount; i++) {
+    if (keys[i] && !keysPrevious[i]) {
+      Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+    }
+    if (!keys[i] && keysPrevious[i]) {
+      Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+    }
+  }
+
+  if (segaGamepad.isConnected && !isConnectedPrevious) {
+    Serial.print("Gamepad "); Serial.print(gamepadIndex); Serial.println(" connected"); 
+  }
+  if (!segaGamepad.isConnected && isConnectedPrevious) {
+    Serial.print("Gamepad "); Serial.print(gamepadIndex); Serial.println(" disconnected"); 
+  }
+
+  if (segaGamepad.isConnected && segaGamepad.isSixBtns != isSixButtonsPrevious) {
+    Serial.print("Gamepad "); Serial.print(gamepadIndex); Serial.print(" type changed to "); 
+    if (segaGamepad.isSixBtns) {
+      Serial.println("\"six buttons\"");
+    } else {
+      Serial.println("\"three buttons\"");
+    }
+  }
+}
+
+void initKeys(bool keys[], SegaGamepad& segaGamepad, ButtonDebounce& modeButtonDebounce) {
   keys[0] = segaGamepad.btnUp;
   keys[1] = segaGamepad.btnDown;
   keys[2] = segaGamepad.btnLeft;
@@ -141,28 +310,5 @@ void handleGamepad(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], c
   keys[9] = segaGamepad.btnZ;
   keys[10] = segaGamepad.btnStart;
   keys[11] = modeButtonDebounce.btnState;
-
-  for (int i = 0; i < keysCount; i++) {
-    if (keys[i] && !keysPrevious[i]) {
-      Keyboard.press(keysKeyboard[i]);
-    }
-
-    if (!keys[i] && keysPrevious[i]) {
-      Keyboard.release(keysKeyboard[i]);
-    }
-  }
-
-  if (serialPrintEnabled) {
-    for (int i = 0; i < keysCount; i++) {
-      if (keys[i] && !keysPrevious[i]) {
-        Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
-      }
-
-      if (!keys[i] && keysPrevious[i]) {
-        Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
-      }
-    }
-  }
-
-  memcpy(keysPrevious, keys, keysCount);
 }
+

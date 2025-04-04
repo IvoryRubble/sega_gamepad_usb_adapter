@@ -10,10 +10,6 @@ SegaGamepad segaGamepad1(A0, A1, A2, A3, 1, 0, 2, delayBeforeReadMicros, delayBe
 SegaGamepad segaGamepad2(9, 8, 7, 6, 5, 4, 3, delayBeforeReadMicros, delayBeforeNextUpdateMicros);
 
 const int keysCount = 12;
-bool keys1[keysCount];
-bool keys2[keysCount];
-bool keysPrevious1[keysCount];
-bool keysPrevious2[keysCount];
 
 const char* keysNames[keysCount] = {
   "btnUp",
@@ -62,6 +58,7 @@ const uint8_t keysKeyboard2[keysCount] = {
 
 void printGamepadStatusOnSetup(SegaGamepad& segaGamepad, int gamepadIndex);
 void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, const uint8_t keysKeyboard[]);
+void updateKeyboard(bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[]);
 void printGamepadStatus(SegaGamepad& segaGamepad, int gamepadIndex, bool keys[], bool keysPrevious[], bool isConnectedPrevious, bool isSixButtonsPrevious);
 void initKeys(bool keys[], SegaGamepad& segaGamepad);
 
@@ -117,18 +114,21 @@ void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, const uint8_t key
   bool keys[keysCount];
   initKeys(keys, segaGamepad);
 
+  updateKeyboard(keys, keysPrevious, keysKeyboard);
+
+  if (serialPrintEnabled) {
+    printGamepadStatus(segaGamepad, gamepadIndex, keys, keysPrevious, isConnectedPrevious, isSixButtonsPrevious);
+  }
+}
+
+void updateKeyboard(bool keys[], bool keysPrevious[], const uint8_t keysKeyboard[]) {
   for (int i = 0; i < keysCount; i++) {
     if (keys[i] && !keysPrevious[i]) {
       Keyboard.press(keysKeyboard[i]);
     }
-
     if (!keys[i] && keysPrevious[i]) {
       Keyboard.release(keysKeyboard[i]);
     }
-  }
-
-  if (serialPrintEnabled) {
-    printGamepadStatus(segaGamepad, gamepadIndex, keys, keysPrevious, isConnectedPrevious, isSixButtonsPrevious);
   }
 }
 

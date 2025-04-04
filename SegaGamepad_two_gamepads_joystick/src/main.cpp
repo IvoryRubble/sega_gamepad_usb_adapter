@@ -51,6 +51,7 @@ const uint8_t keysJoystick[keysCount] = {
 
 void printGamepadStatusOnSetup(SegaGamepad& segaGamepad, int gamepadIndex);
 void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, ButtonDebounce& modeButtonDebounce, Joystick_& joystick);
+void updateJoystick(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], Joystick_& joystick);
 void printGamepadStatus(SegaGamepad& segaGamepad, int gamepadIndex, bool keys[], bool keysPrevious[], bool isConnectedPrevious, bool isSixButtonsPrevious);
 void initKeys(bool keys[], SegaGamepad& segaGamepad, ButtonDebounce& modeButtonDebounce);
 
@@ -108,6 +109,14 @@ void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, ButtonDebounce& m
   bool keys[keysCount];
   initKeys(keys, segaGamepad, modeButtonDebounce);
 
+  updateJoystick(segaGamepad, keys, keysPrevious, joystick);
+
+  if (serialPrintEnabled) {
+    printGamepadStatus(segaGamepad, gamepadIndex, keys, keysPrevious, isConnectedPrevious, isSixButtonsPrevious);
+  }
+}
+
+void updateJoystick(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], Joystick_& joystick) {
   for (int i = 0; i < keysCount; i++) {
     if (keys[i] && !keysPrevious[i]) {
       if (i >= 4) {
@@ -145,10 +154,6 @@ void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, ButtonDebounce& m
     } else {
       joystick.setHatSwitch(0, -1);
     }
-  }
-
-  if (serialPrintEnabled) {
-    printGamepadStatus(segaGamepad, gamepadIndex, keys, keysPrevious, isConnectedPrevious, isSixButtonsPrevious);
   }
 }
 
