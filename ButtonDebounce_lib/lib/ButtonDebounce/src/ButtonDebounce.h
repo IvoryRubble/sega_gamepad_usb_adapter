@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ButtonDebounce_h
+#define ButtonDebounce_h
+
 #include <Arduino.h>
 
 class ButtonDebounce {
@@ -18,3 +20,5 @@ class ButtonDebounce {
     bool btnStateInternal = false;
 
 };
+
+#endif
