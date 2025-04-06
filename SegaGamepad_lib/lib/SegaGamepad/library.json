@@ -1,6 +1,6 @@
 {
     "name": "SegaGamepad",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Yet another library to read Sega Mega Drive (aka Sega Genesis) gamepad",
     "keywords": "gamepad, joystick, sega, mega, drive, genesis",
     "repository": {
@@ -15,7 +15,7 @@
         }
     ],
     "license": "MIT",
-    "homepage": "https://github.com/IvoryRubble/sega_gamepad_usb_adapter",
+    "homepage": "https://github.com/IvoryRubble/sega_gamepad_usb_adapter/tree/master/SegaGamepad_lib/lib/SegaGamepad",
     "frameworks": "Arduino",
     "platforms": "*",
     "examples": [
