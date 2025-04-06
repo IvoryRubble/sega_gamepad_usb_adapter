@@ -6,6 +6,7 @@
 #include "ButtonDebounce.h"
 
 bool serialPrintEnabled = false;
+unsigned long previousKeyUpdateTime = 0;
 
 const int outputModesCount = 2;
 enum OutputMode {
@@ -271,12 +272,16 @@ void updateJoystick(SegaGamepad& segaGamepad, bool keys[], bool keysPrevious[], 
 }
 
 void printGamepadStatus(SegaGamepad& segaGamepad, int gamepadIndex, bool keys[], bool keysPrevious[], bool isConnectedPrevious, bool isSixButtonsPrevious) {
+  unsigned long currentTime = millis();
+
   for (int i = 0; i < keysCount; i++) {
     if (keys[i] && !keysPrevious[i]) {
-      Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+      Serial.print("+ "); Serial.print(currentTime - previousKeyUpdateTime); Serial.print(" ms "); Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+      previousKeyUpdateTime = currentTime;
     }
     if (!keys[i] && keysPrevious[i]) {
-      Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+      Serial.print("+ "); Serial.print(currentTime - previousKeyUpdateTime); Serial.print(" ms "); Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+      previousKeyUpdateTime = currentTime;
     }
   }
 

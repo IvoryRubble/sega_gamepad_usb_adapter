@@ -3,6 +3,7 @@
 #include "SegaGamepad.h"
 
 const bool serialPrintEnabled = true;
+unsigned long previousKeyUpdateTime = 0;
 
 const unsigned int delayBeforeReadMicros = 10; 
 const unsigned int delayBeforeNextUpdateMicros = 2000;
@@ -133,12 +134,16 @@ void updateKeyboard(bool keys[], bool keysPrevious[], const uint8_t keysKeyboard
 }
 
 void printGamepadStatus(SegaGamepad& segaGamepad, int gamepadIndex, bool keys[], bool keysPrevious[], bool isConnectedPrevious, bool isSixButtonsPrevious) {
+  unsigned long currentTime = millis();
+
   for (int i = 0; i < keysCount; i++) {
     if (keys[i] && !keysPrevious[i]) {
-      Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+      Serial.print("+ "); Serial.print(currentTime - previousKeyUpdateTime); Serial.print(" ms "); Serial.print(keysNames[i]); Serial.print(" pressed on gamepad "); Serial.println(gamepadIndex);
+      previousKeyUpdateTime = currentTime;
     }
     if (!keys[i] && keysPrevious[i]) {
-      Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+      Serial.print("+ "); Serial.print(currentTime - previousKeyUpdateTime); Serial.print(" ms "); Serial.print(keysNames[i]); Serial.print(" released on gamepad "); Serial.println(gamepadIndex);
+      previousKeyUpdateTime = currentTime;
     }
   }
 
