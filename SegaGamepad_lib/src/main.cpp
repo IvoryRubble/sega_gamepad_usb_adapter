@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Keyboard.h>
 #include "SegaGamepad.h"
 
 SegaGamepad segaGamepad(1, 2, 3, 4, 5, 6, 7);

@@ -1,6 +1,6 @@
 {
     "name": "SegaGamepad",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Yet another library to read Sega Mega Drive (aka Sega Genesis) gamepad",
     "keywords": "gamepad, joystick, sega, mega, drive, genesis",
     "repository": {
