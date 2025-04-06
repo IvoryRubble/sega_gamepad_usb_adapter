@@ -25,8 +25,8 @@
 // THE SOFTWARE.
 //
 // -----------------------------------------------------------------------------
-// Yet another library to read Sega Mega Drive (aka Sega Genesis) gamepad
-// Supports both three and six buttons controllers
+// Yet another library to read Sega Mega Drive (aka Sega Genesis) gamepad.
+// Supports both three and six buttons controllers.
 //
 // -----------------------------------------------------------------------------
 // Sources:
@@ -61,27 +61,27 @@
 // -----------------------------------------------------------------------------
 // Connection:                                 
 //
-// Connect pin8 and pin5 to GND and +5V
-// Connect pin1, pin2, pin3, pin4, pin6, pin7, pin9 to microcontroller I/O pins            
+// Connect pin8 and pin5 to GND and +5V.
+// Connect pin1, pin2, pin3, pin4, pin6, pin7, pin9 to microcontroller I/O pins.            
 //
 // ----------------------------------------------------------------------------- 
 // Usage:
 //
-// Set correcponding pin1, pin2, pin3, pin4, pin6, pin7, pin9 numbers in SegaGamepad::SegaGamepad() constructor
-// Optionally set custom delayBeforeReadMicros and delayBeforeNextUpdateMicros delays
+// Set correcponding pin1, pin2, pin3, pin4, pin6, pin7, pin9 numbers in SegaGamepad::SegaGamepad() constructor.
+// Optionally set custom delayBeforeReadMicros and delayBeforeNextUpdateMicros delays.
 // Example:
 //      SegaGamepad segaGamepad(1, 2, 3, 4, 5, 6, 7);
 //
-// Call SegaGamepad::init() method in setup() procedure to initialize microcontroller ports for gamepad 
+// Call SegaGamepad::init() method in setup() procedure to initialize microcontroller ports for gamepad. 
 // Example: 
 //      segaGamepad.init();
 //
-// Call SegaGamepad::update() method to read new values from controller
-// Then you can keys get values from segaGamepad object fields. True value means corresponding key is pressed
-// You also can check if controller is connected by reading isConnected flag
-// And you can check type of controller (three or six buttons) by reading isSixBtns flag
+// Call SegaGamepad::update() method to read new values from controller.
+// Then you can keys get values from segaGamepad object fields. True value means corresponding key is pressed.
+// You also can check if controller is connected by reading isConnected flag.
+// And you can check type of controller (three or six buttons) by reading isSixBtns flag.
 // When controller is not connected then isConnected flag is set to False, 
-//      all buttons values are set to False, is isSixBtns flag is set to false
+//      all buttons values are set to False, is isSixBtns flag is set to False.
 // Example: 
 //      segaGamepad.update();
 //      Serial.println(segaGamepad.isConnected);
