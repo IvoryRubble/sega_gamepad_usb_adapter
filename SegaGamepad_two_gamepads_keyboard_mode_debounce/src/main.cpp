@@ -116,7 +116,6 @@ void handleGamepad(SegaGamepad& segaGamepad, int gamepadIndex, ButtonDebounce& m
   bool isSixButtonsPrevious = segaGamepad.isSixBtns;
 
   segaGamepad.update();
-  modeButtonDebounce.updateState(segaGamepad.btnMode);
 
   bool keys[keysCount];
   initKeys(keys, segaGamepad, modeButtonDebounce);
@@ -182,5 +181,6 @@ void initKeys(bool keys[], SegaGamepad& segaGamepad, ButtonDebounce& modeButtonD
   keys[8] = segaGamepad.btnY;
   keys[9] = segaGamepad.btnZ;
   keys[10] = segaGamepad.btnStart;
+  modeButtonDebounce.updateState(segaGamepad.btnMode);
   keys[11] = modeButtonDebounce.btnState;
 }
