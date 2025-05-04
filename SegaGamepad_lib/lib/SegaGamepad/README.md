@@ -4,6 +4,20 @@
 Yet another library to read Sega Mega Drive (aka Sega Genesis) gamepad.  
 Supports both three and six buttons controllers.  
 
+## Installation
+
+### Arduino IDE
+
+- Download this repo as `.zip` file: https://github.com/IvoryRubble/ArduinoSegaGamepadLibrary/archive/master.zip  
+- In the Arduino IDE select `Sketch` > `Include Library` > `Add .ZIP Library...`. Browse to where the downloaded ZIP file is located and click `Open`. The SegaGamepad library's examples will now appear under `File` > `Examples` > `SegaGamepad`.  
+
+Or simply open library manager in Arduino IDE (`Tools` > `Manage Libraries`) and search for `SegaGamepad`.  
+
+### PlatformIO
+
+Library is also available in PlatformIO registry:  
+https://registry.platformio.org/libraries/ivoryrubble/SegaGamepad   
+
 ## Sources  
 
 Gamepad protocol description:  
