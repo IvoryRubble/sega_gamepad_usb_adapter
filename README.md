@@ -2,21 +2,23 @@
 
 Article on habr.com: https://habr.com/p/900300/  
 
-`SegaGamepad` library: https://registry.platformio.org/libraries/ivoryrubble/SegaGamepad   
+`SegaGamepad` library:  
+https://github.com/IvoryRubble/ArduinoSegaGamepadLibrary    
+https://registry.platformio.org/libraries/ivoryrubble/SegaGamepad   
 
 Adapter features:  
 - Supports two gamepads
 - No gamepads modification needed
 - Supports both 3-buttons and 6-buttons gamepads
 - Recognized by PC as USB keyboard or two USB gamepads (working mode can be switched any time)  
-  
-![](photos/adapter_connected_to_PC.jpg)  
 
 Video demo:  
 https://youtu.be/ejnmY7F8hcU   
 https://youtu.be/ySdsnPrBBsU  
 https://vkvideo.ru/video-228936534_456239017   
 https://vkvideo.ru/video-228936534_456239020  
+
+![](photos/adapter_connected_to_PC.jpg)  
 
 # SegaGamepad library 
 
